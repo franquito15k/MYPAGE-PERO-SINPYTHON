@@ -1,11 +1,14 @@
-from flask import Flask, render_template, request, send_file, jsonify, redirect, url_for
+from flask import Flask, render_template, request, send_file, jsonify, redirect, url_for, Response
 from yt_dlp import YoutubeDL
 import os
 import json
 import mysql.connector
 from mysql.connector import Error
+import unicodedata
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Configuración de la base de datos
 db_config = {
@@ -32,7 +35,7 @@ DOWNLOAD_FOLDER = os.path.join(BASE_DIR, 'downloads')
 # Creo la carpeta de descargas si no existe
 if not os.path.exists(DOWNLOAD_FOLDER):
     os.makedirs(DOWNLOAD_FOLDER)
-    
+
 def download_video(url):
     ydl_opts = {
         'outtmpl': os.path.join(DOWNLOAD_FOLDER, '%(title)s.%(ext)s')
@@ -42,8 +45,7 @@ def download_video(url):
         video_path = ydl.prepare_filename(info_dict)
         video_title = info_dict.get('title', 'Unknown Title')
         return video_path, video_title
-    
-    
+
 def insertar_descarga(nombre_video):
     conn = get_db_connection()
     if conn:
@@ -130,6 +132,33 @@ def download():
         "idDescarga": video_id
     })
 
-
+@app.route('/video/<int:video_id>', methods=['GET'])
+def get_video(video_id):
+    conn = get_db_connection()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT video, nombre_video FROM descargas_videos WHERE idDescarga = %s", (video_id,))
+            result = cursor.fetchone()
+            if result:
+                video_data, video_name = result
+                # Normalizar el nombre del archivo para eliminar caracteres no ASCII
+                video_name_ascii = unicodedata.normalize('NFKD', video_name).encode('ascii', 'ignore').decode('ascii')
+                # Añadir la extensión .mp4 al nombre del archivo
+                video_name_ascii += '.mp4'
+                # Servir el video en formato binario para descargar
+                response = Response(video_data, content_type='application/octet-stream')
+                response.headers['Content-Disposition'] = f'attachment; filename={video_name_ascii}'
+                return response
+            else:
+                return jsonify({"message": "Video no encontrado"}), 404
+        except Error as e:
+            print(f"Error al obtener el video: {e}")
+            return jsonify({"message": "Error al obtener el video"}), 500
+        finally:
+            cursor.close()
+            conn.close()
+    else:
+        return jsonify({"message": "No se pudo conectar con la base de datos"}), 500
 if __name__ == '__main__':
     app.run(debug=True)
