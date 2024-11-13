@@ -1,7 +1,41 @@
+<?php
+// Conexión a la base de datos
+$conn = new mysqli("localhost", "root", "", "inter_bd");
+if ($conn->connect_error) {
+    die("Error de conexión: " . $conn->connect_error);
+}
+
+// Función para obtener el contenido
+function obtenerContenido($conn, $ubicacion)
+{
+    $stmt = $conn->prepare("SELECT contenido FROM contenido_estatico WHERE ubicacion = ?");
+    $stmt->bind_param("s", $ubicacion);
+    $stmt->execute();
+    $contenido = null;
+    $stmt->bind_result($contenido);
+    $stmt->fetch();
+    $stmt->close();
+    return $contenido;
+}
+
+// Función para obtener el contenido de las imágenes
+function obtenerImagen($conn, $ubicacion)
+{
+    $stmt = $conn->prepare("SELECT contenido, alt_text FROM contenido_estatico WHERE ubicacion = ?");
+    $stmt->bind_param("s", $ubicacion);
+    $stmt->execute();
+    $src = $alt = null;
+    $stmt->bind_result($src, $alt);
+    $stmt->fetch();
+    $stmt->close();
+    return ["src" => $src, "alt" => $alt];
+}
+?>
+
 <main style="width: 90%; overflow-y: hidden;">
     <div class="recuadros">
         <section class="flex column align-items-center">
-            <h3>Descargar Video de Youtube</h3>
+            <h3><?= obtenerContenido($conn, 'titulo_descargar_video') ?></h3>
             <form class="flex row justify-row" id="download-form" method="POST">
                 <div>
                     <label for="video-url">Pegar alado la URL: </label>
@@ -14,27 +48,34 @@
                 </div>
             </form>
         </section>
-        <img src="./static/img/loadingcat.jpg" alt="loading gif" id="loadingGif" style="display: none;">
+
+        <?php $loadingGif = obtenerImagen($conn, 'loading_gif'); ?>
+        <img src="<?= $loadingGif['src'] ?>" alt="<?= $loadingGif['alt'] ?>" id="loadingGif" style="display: none;">
+
         <section class="flex column align-items-center justify-content-center">
-            <h2>Instant Download - El mejor descargador de mp4 de Youtube 2024</h2>
-            <p>"Youtube to Video" es una herramienta que permite descargar videos de Youtube rápidamente y en diversos formatos, como MP4, sin necesidad de conversión de audio.</p>
+            <h2><?= obtenerContenido($conn, 'titulo_instant_download') ?></h2>
+            <p><?= obtenerContenido($conn, 'descripcion_herramienta') ?></p>
         </section>
 
         <section class="flex column align-items-center justify-content-center">
-            <h2>Cómo descargar mp3 de Youtube más rápido</h2>
+            <h2><?= obtenerContenido($conn, 'titulo_descargar_mp3') ?></h2>
             <div class="flex row justify-content-center" id="tablet-query">
                 <div class="flex row" id="text-img">
-                    <img src="./static/img/link-solid.png" alt="link-image" width="32" height="32">
-                    <div>Pegue el enlace convertir YouTube a MP3 en el cuadro de búsqueda</div>
+                    <?php $linkImage = obtenerImagen($conn, 'link_image'); ?>
+                    <img src="<?= $linkImage['src'] ?>" alt="<?= $linkImage['alt'] ?>" width="32" height="32">
+                    <div><?= obtenerContenido($conn, 'instruccion_link') ?></div>
                 </div>
                 <div class="flex row" id="text-img">
-                    <img src="./static/img/settings.png" alt="configurator-image" width="32" height="32">
-                    <div>Haga clic en el botón "Obtener video del enlace"</div>
+                    <?php $configImage = obtenerImagen($conn, 'configurator_image'); ?>
+                    <img src="<?= $configImage['src'] ?>" alt="<?= $configImage['alt'] ?>" width="32" height="32">
+                    <div><?= obtenerContenido($conn, 'instruccion_boton') ?></div>
                 </div>
             </div>
         </section>
     </div>
 </main>
+
+<?php $conn->close(); ?>
 
 <script>
     document.getElementById('download-form').addEventListener('submit', async function(event) {

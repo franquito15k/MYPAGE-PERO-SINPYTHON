@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-11-2024 a las 21:48:11
+-- Tiempo de generación: 13-11-2024 a las 22:28:01
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -24,6 +24,35 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `contenido_estatico`
+--
+
+CREATE TABLE `contenido_estatico` (
+  `id` int(11) NOT NULL,
+  `tipo` varchar(10) DEFAULT NULL,
+  `ubicacion` varchar(255) DEFAULT NULL,
+  `contenido` text DEFAULT NULL,
+  `alt_text` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `contenido_estatico`
+--
+
+INSERT INTO `contenido_estatico` (`id`, `tipo`, `ubicacion`, `contenido`, `alt_text`) VALUES
+(1, 'h3', 'titulo_descargar_video', 'Descargar Video de Youtube', NULL),
+(2, 'h2', 'titulo_instant_download', 'Instant Download - El mejor descargador de mp4 de Youtube 2024', NULL),
+(3, 'h2', 'titulo_descargar_mp3', 'Cómo descargar mp3 de Youtube más rápido', NULL),
+(4, 'p', 'descripcion_herramienta', '\"Youtube to Video\" es una herramienta que permite descargar videos de Youtube rápidamente y en diversos formatos, como MP4, sin necesidad de conversión de audio.', NULL),
+(5, 'img', 'loading_gif', './static/img/loadingcat.jpg', 'loading gif'),
+(6, 'img', 'link_image', './static/img/link-solid.png', 'link-image'),
+(7, 'img', 'configurator_image', './static/img/settings.png', 'configurator-image'),
+(8, 'div', 'instruccion_link', 'Pegue el enlace convertir YouTube a MP3 en el cuadro de búsqueda', NULL),
+(9, 'div', 'instruccion_boton', 'Haga clic en el botón \"Obtener video del enlace\"', NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `descargas_videos`
 --
 
@@ -39,7 +68,7 @@ CREATE TABLE `descargas_videos` (
 --
 
 INSERT INTO `descargas_videos` (`idDescarga`, `cantidades`, `nombre_video`, `video`) VALUES
-(31, 1, '20.000 Logros en STEAM!!!!',123123 );
+(31, 1, '20.000 Logros en STEAM!!!!', );
 
 --
 -- Disparadores `descargas_videos`
@@ -94,33 +123,6 @@ CREATE TRIGGER `after_descarga_update` AFTER UPDATE ON `descargas_videos` FOR EA
 END
 $$
 DELIMITER ;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `sections`
---
-
-CREATE TABLE `sections` (
-  `id` int(11) NOT NULL,
-  `section_name` varchar(255) NOT NULL,
-  `content` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `sections`
---
-
-INSERT INTO `sections` (`id`, `section_name`, `content`) VALUES
-(1, 'section1_h3', 'Descargar Videos Youtube'),
-(2, 'section1_h2', 'Instant Download - El mejor descargador de mp4 de Youtube 2024'),
-(3, 'section1_p', '\"Youtube to Video\" es una herramienta que permite descargar videos de Youtube rápidamente y en diversos formatos, como MP4, sin necesidad de conversión de audio.'),
-(4, 'section1_img', './static/img/loadingcat.jpg'),
-(5, 'section2_h2', 'Cómo descargar mp3 de Youtube más rápido'),
-(6, 'section2_div1', 'Pegue el enlace convertir YouTube a MP3 en el cuadro de búsqueda'),
-(7, 'section2_div2', 'Haga clic en el botón \"Obtener video del enlace\"'),
-(8, 'section2_img1', './static/img/link-solid.png'),
-(9, 'section2_img2', './static/img/settings.png');
 
 -- --------------------------------------------------------
 
@@ -192,16 +194,16 @@ INSERT INTO `video_usuario` (`id`, `usuario_id`, `cant_descargas`) VALUES
 --
 
 --
+-- Indices de la tabla `contenido_estatico`
+--
+ALTER TABLE `contenido_estatico`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `descargas_videos`
 --
 ALTER TABLE `descargas_videos`
   ADD PRIMARY KEY (`idDescarga`);
-
---
--- Indices de la tabla `sections`
---
-ALTER TABLE `sections`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `sesiones`
@@ -228,16 +230,16 @@ ALTER TABLE `video_usuario`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `contenido_estatico`
+--
+ALTER TABLE `contenido_estatico`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT de la tabla `descargas_videos`
 --
 ALTER TABLE `descargas_videos`
   MODIFY `idDescarga` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
-
---
--- AUTO_INCREMENT de la tabla `sections`
---
-ALTER TABLE `sections`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
